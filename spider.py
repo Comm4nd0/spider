@@ -31,9 +31,6 @@ class spider():
         self.get_url()
 
     def get_url(self):
-        global URL_DOMAIN
-        global URL_SUFFIX
-
         parser = argparse.ArgumentParser(description='Search an entire domain for something!')
         parser.add_argument('--url')
         parser.add_argument('--search', help='Enter key word(s)')
@@ -45,14 +42,15 @@ class spider():
         self.URL_DOMAIN = extracted.domain
         self.URL_SUFFIX = extracted.suffix
 
-        self.validate_url(url)
-        self.get_html(url)
+        res = self.validate_url(url)
+        if res:
+            self.get_html(url)
+        else:
+            print(colours.FAIL + "Invalid URL - Example: http://reddit.com" + colours.ENDC)
+            exit()
 
     def validate_url(self, url):
-        if validators.url(url, public=True):
-            return True
-        else:
-            return False
+        return validators.url(url, public=True)
 
     def get_html(self, url):
         self.stats(url)
@@ -63,6 +61,8 @@ class spider():
                 soup = BeautifulSoup(request, "lxml")
                 self.search(url, soup)
                 self.get_urls(soup)
+            except (KeyboardInterrupt, SystemExit):
+                raise
             except Exception as error:
                 print(error)
 
@@ -71,6 +71,8 @@ class spider():
                 try:
                     self.CHECKED.append(url)
                     self.CURRENT_DOMAIN.remove(url)
+                except (KeyboardInterrupt, SystemExit):
+                    raise
                 except Exception as error:
                     print(error)
 
@@ -105,7 +107,8 @@ class spider():
 
     def stats(self, url):
         os.system('clear')
-        print("""  ;               ,           
+        print("""  
+                   ;               ,           
                  ,;                 '.         
                 ;:                   :;        
                ::                     ::       
@@ -129,7 +132,7 @@ class spider():
          :.    ::   ::::::;  :::::::   :     ; 
           ;    ::   :::::::  :::::::   :    ;  
            '   ::   ::::::....:::::'  ,:   '   
-            '  ::    :::::::::::::"   ::       
+            '  ::    :::::::::::::"   ::
                ::     ':::::::::"'    ::       
                ':       """""""'            ::       
                 ::                   ;:        
