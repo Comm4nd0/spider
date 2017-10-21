@@ -9,7 +9,8 @@ import tldextract
 import os
 import re
 
-class colours():
+class Colours:
+    # set the values for the colours
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
     OKGREEN = '\033[92m'
@@ -19,34 +20,27 @@ class colours():
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-class spider():
-    def __init__(self):
-        self.URL_DOMAIN = ''
-        self.URL_SUFFIX = ''
-        self.CURRENT_DOMAIN = []
-        self.CHECKED = []
-        self.URLS_FOUND = 0
-        self.DATA = ''
-
-        self.get_url()
+class Spider:
+    def __init__(self, url, key):
+        self.url = url
+        self.key = key
+        self.url_domain = ''
+        self.url_suffix = ''
+        self.current_domain = []
+        self.checked = []
+        self.urls_found = 0
+        self.data = ''
 
     def get_url(self):
-        parser = argparse.ArgumentParser(description='Search an entire domain for something!')
-        parser.add_argument('--url')
-        parser.add_argument('--search', help='Enter key word(s)')
-        args = parser.parse_args()
-        url = args.url
-        self.KEY = args.search
+        # set the global domain and suffix
+        extracted = tldextract.extract(self.url)
+        self.url_domain = extracted.domain
+        self.url_suffix = extracted.suffix
 
-        extracted = tldextract.extract(url)
-        self.URL_DOMAIN = extracted.domain
-        self.URL_SUFFIX = extracted.suffix
-
-        res = self.validate_url(url)
-        if res:
-            self.get_html(url)
+        if self.validate_url(self.url):
+            self.get_html(self.url)
         else:
-            print(colours.FAIL + "Invalid URL - Example: http://reddit.com" + colours.ENDC)
+            print(Colours.FAIL + "Invalid URL - Example: http://reddit.com" + Colours.ENDC)
             exit()
 
     def validate_url(self, url):
@@ -66,11 +60,11 @@ class spider():
             except Exception as error:
                 print(error)
 
-        for item in self.CURRENT_DOMAIN:
+        for item in self.current_domain:
             if item == url:
                 try:
-                    self.CHECKED.append(url)
-                    self.CURRENT_DOMAIN.remove(url)
+                    self.checked.append(url)
+                    self.current_domain.remove(url)
                 except (KeyboardInterrupt, SystemExit):
                     raise
                 except Exception as error:
@@ -80,30 +74,29 @@ class spider():
 
     def get_urls(self, soup):
         for link in soup.find_all('a', href=True):
-            self.URLS_FOUND += 1
-            res = self.validate_url(link['href'])
+            self.urls_found += 1
             extracted = tldextract.extract(link['href'])
-            if res == True:
-                if link['href'] not in self.CURRENT_DOMAIN and link['href'][-1:] != '#':
-                    if extracted.domain == self.URL_DOMAIN and extracted.suffix == self.URL_SUFFIX:
-                        self.CURRENT_DOMAIN.append(link['href'])
+            if self.validate_url(link['href']):
+                if link['href'] not in self.current_domain and link['href'][-1:] != '#':
+                    if extracted.domain == self.url_domain and extracted.suffix == self.url_suffix:
+                        self.current_domain.append(link['href'])
                 else:
                     # might have a hash on the end, i.e. dead link!
                     pass
             elif extracted.domain == '' and extracted.suffix == '' and link['href'][-1:] != '#':
-                self.CURRENT_DOMAIN.append('http://' + self.URL_DOMAIN + '.' + self.URL_SUFFIX + link['href'])
+                self.current_domain.append('http://' + self.url_domain + '.' + self.url_suffix + link['href'])
 
     def loop_through_urls(self):
-        for url in self.CURRENT_DOMAIN:
-            if url not in self.CHECKED:
-                self.URLS_FOUND += 1
+        for url in self.current_domain:
+            if url not in self.checked:
+                self.urls_found += 1
                 self.get_html(url)
             else:
-                self.CURRENT_DOMAIN.remove(url)
+                self.current_domain.remove(url)
 
     def search(self, url, soup):
-        if soup.find_all(string=re.compile(self.KEY)):
-            self.DATA += url + '\n'
+        if soup.find_all(string=re.compile(self.key)):
+            self.data += url + '\n'
 
     def stats(self, url):
         os.system('clear')
@@ -143,15 +136,23 @@ class spider():
 
 
         """)
-        print(colours.HEADER + "##### Welcome to the spider #####" + colours.ENDC)
-        print(colours.OKGREEN + "+-------------------------------------------------+" + colours.ENDC)
-        print(colours.OKBLUE + "Total URL's: " + colours.ENDC + str(self.URLS_FOUND))
-        print(colours.OKBLUE + "Current URL: " + colours.ENDC + url)
-        print(colours.OKBLUE + "Unique URL's scanned: " + colours.ENDC + str(len(self.CHECKED)))
-        print(colours.OKBLUE + "Search key: " + colours.ENDC + self.KEY)
-        print(colours.OKBLUE + "Positive results: " + colours.ENDC + str(len(self.DATA.split('\n'))-1))
-        print(colours.OKGREEN + "+-------------------------------------------------+" + colours.ENDC)
-        print(self.DATA)
+        print(Colours.HEADER + "##### Welcome to the spider #####" + Colours.ENDC)
+        print(Colours.OKGREEN + "+-------------------------------------------------+" + Colours.ENDC)
+        print(Colours.OKBLUE + "Total URL's: " + Colours.ENDC + str(self.urls_found))
+        print(Colours.OKBLUE + "Current URL: " + Colours.ENDC + url)
+        print(Colours.OKBLUE + "Unique URL's scanned: " + Colours.ENDC + str(len(self.checked)))
+        print(Colours.OKBLUE + "Search key: " + Colours.ENDC + self.key)
+        print(Colours.OKBLUE + "Positive results: " + Colours.ENDC + str(len(self.data.split('\n'))-1))
+        print(Colours.OKGREEN + "+-------------------------------------------------+" + Colours.ENDC)
+        print(self.data)
 
 if __name__ == "__main__":
-    spider()
+    # handle the args
+    parser = argparse.ArgumentParser(description='Search an entire domain for something!')
+    parser.add_argument('--url')
+    parser.add_argument('--search', help='Enter key word(s)')
+    args = parser.parse_args()
+    url = args.url
+    key = args.search
+
+    web = Spider(url, key).get_url()
