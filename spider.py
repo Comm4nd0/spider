@@ -105,7 +105,7 @@ class spider():
 
     def stats(self, url):
         os.system('clear')
-        print("""           ;               ,           
+        print("""  ;               ,           
                  ,;                 '.         
                 ;:                   :;        
                ::                     ::       
@@ -146,7 +146,7 @@ class spider():
         print(colours.OKBLUE + "Current URL: " + colours.ENDC + url)
         print(colours.OKBLUE + "Unique URL's scanned: " + colours.ENDC + str(len(self.CHECKED)))
         print(colours.OKBLUE + "Search key: " + colours.ENDC + self.KEY)
-        print(colours.OKBLUE + "Positive results: " + colours.ENDC + str(len(self.DATA.split('\n'))))
+        print(colours.OKBLUE + "Positive results: " + colours.ENDC + str(len(self.DATA.split('\n'))-1))
         print(colours.OKGREEN + "+-------------------------------------------------+" + colours.ENDC)
         print(self.DATA)
 

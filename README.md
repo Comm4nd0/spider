@@ -10,3 +10,26 @@ optional arguments:
   --search SEARCH  Enter key word(s)
 
 EXAMPLE: ./spider.py --url http://reddit.com --search boobs
+
+                                 |
+                                 |
+                                 |
+                                 |
+                                 |
+                                 |
+                                 |
+                             _ ----- _
+                        .-~             ~-.        
+                      /                     \
+           .-- -- -- |                       | -- -- --.
+       .-~ / ~~ ~~ ~~ \        O   O        / ~~ ~~ ~~ \ ~-.
+    .-~   /        _ - ~ ~-.             .-~ ~ - _        \   ~-.
+       /      /~          /  ~ ----- ~  \          ~\      \
+     /       /           /               \           \       \
+            /           /                 \           \
+           /           /                   \           \
+          /           |                     |           \
+                      |                     |
+                      |                     |
+                      |                     |
+                      |                     |
