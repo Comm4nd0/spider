@@ -41,7 +41,7 @@ class Spider:
             self.get_html(self.url)
         else:
             print(Colours.FAIL + "Invalid URL - Example: http://reddit.com" + Colours.ENDC)
-            exit()
+            quit()
 
     def validate_url(self, url):
         return validators.url(url, public=True)
@@ -56,9 +56,7 @@ class Spider:
                 self.search(url, soup)
                 self.get_urls(soup)
             except (KeyboardInterrupt, SystemExit):
-                raise
-            except Exception as error:
-                print(error)
+                quit()
 
         for item in self.current_domain:
             if item == url:
@@ -66,9 +64,7 @@ class Spider:
                     self.checked.append(url)
                     self.current_domain.remove(url)
                 except (KeyboardInterrupt, SystemExit):
-                    raise
-                except Exception as error:
-                    print(error)
+                    quit()
 
         self.loop_through_urls()
 
@@ -87,17 +83,21 @@ class Spider:
                 self.current_domain.append('http://' + self.url_domain + '.' + self.url_suffix + link['href'])
 
     def loop_through_urls(self):
-        for url in self.current_domain:
-            if url not in self.checked:
-                self.urls_found += 1
-                self.get_html(url)
-            else:
-                self.current_domain.remove(url)
-
+        try:
+            for url in self.current_domain:
+                if url not in self.checked:
+                    self.urls_found += 1
+                    self.get_html(url)
+                else:
+                    self.current_domain.remove(url)
+        except (KeyboardInterrupt, SystemExit):
+            exit()
     def search(self, url, soup):
         if soup.find_all(string=re.compile(self.key)):
             self.data += url + '\n'
 
+    def quit(self):
+        exit()
     def stats(self, url):
         os.system('clear')
         print("""  
