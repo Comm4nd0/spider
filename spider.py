@@ -130,10 +130,9 @@ class Spider:
                ':       """""""'            ::       
                 ::                   ;:        
                 ':;                 ;:"        
-        -hrr-     ';              ,;'          
+                  ';              ,;'          
                     "'           '"            
                       '
-
 
         """)
         print(Colours.HEADER + "##### Welcome to the spider #####" + Colours.ENDC)
@@ -146,13 +145,27 @@ class Spider:
         print(Colours.OKGREEN + "+-------------------------------------------------+" + Colours.ENDC)
         print(self.data)
 
-if __name__ == "__main__":
+def args():
     # handle the args
     parser = argparse.ArgumentParser(description='Search an entire domain for something!')
     parser.add_argument('--url')
     parser.add_argument('--search', help='Enter key word(s)')
     args = parser.parse_args()
-    url = args.url
-    key = args.search
 
+    if not args.url:
+        print(Colours.FAIL + "Missing URL - Example: --url http://cia.com" + Colours.ENDC)
+        exit()
+    else:
+        url = args.url
+
+    if not args.search:
+        print(Colours.FAIL + "Missing search string - Example: --search \"aliens exist!\"" + Colours.ENDC)
+        exit()
+    else:
+        key = args.search
+
+    return url, key
+
+if __name__ == "__main__":
+    url, key = args()
     web = Spider(url, key).get_url()
