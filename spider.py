@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 
-import argparse
-import urllib.request
-import urllib.parse
-from bs4 import BeautifulSoup
-import validators
-import tldextract
-import os
-import re
+try:
+    import argparse
+    import urllib.request
+    import urllib.parse
+    from bs4 import BeautifulSoup
+    import validators
+    import tldextract
+    import os
+    import re
+except:
+    print("Please make sure you install all libraries listed in requirements.txt")
 
 class Colours:
     # set the values for the colours
