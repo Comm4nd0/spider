@@ -4,6 +4,7 @@ try:
     import argparse
     import urllib.request
     import urllib.parse
+    #import urllib.urlretrieve
     from bs4 import BeautifulSoup
     import validators
     import tldextract
@@ -24,7 +25,7 @@ class Colours:
     UNDERLINE = '\033[4m'
 
 class Spider:
-    def __init__(self, url, key):
+    def __init__(self, url, mode, key):
         self.url = url
         self.key = key
         self.url_domain = ''
@@ -33,6 +34,9 @@ class Spider:
         self.checked = []
         self.urls_found = 0
         self.data = ''
+
+        self.mode = getattr(self, mode)
+
 
     def get_url(self):
         # set the global domain and suffix
@@ -56,7 +60,7 @@ class Spider:
             try:
                 request = urllib.request.urlopen(url)
                 soup = BeautifulSoup(request, "lxml")
-                self.search(url, soup)
+                self.mode(url, soup)
                 self.get_urls(soup)
             except (KeyboardInterrupt, SystemExit):
                 quit()
@@ -95,9 +99,29 @@ class Spider:
                     self.current_domain.remove(url)
         except (KeyboardInterrupt, SystemExit):
             exit()
+
     def search(self, url, soup):
         if soup.find_all(string=re.compile(self.key)):
             self.data += url + '\n'
+
+    def img(self,url, soup):
+        if not os.path.isdir(os.getcwd() + '/images/'):
+            os.makedirs(os.getcwd() + '/images/')
+        link = soup.find_all('img')
+        for item in link:
+            try:
+                if self.key in str(item['src']) and not os.path.isfile('images/' + os.path.basename(item['src'])):
+                    urllib.request.urlretrieve(item['src'], 'images/' + os.path.basename(item['src']))
+                    self.data += 'Downloaded: ' + str(os.path.basename(item['src'])) + '\n'
+
+            except Exception as err:
+                try:
+                    urllib.request.urlretrieve('http:' + item['src'], 'images/' + os.path.basename(item['src']))
+                except:
+                    pass
+                print(err)
+        #self.data += link + '\n'
+
 
     def quit(self):
         exit()
@@ -153,6 +177,7 @@ def args():
     parser = argparse.ArgumentParser(description='Search an entire domain for something!')
     parser.add_argument('--url')
     parser.add_argument('--search', help='Enter key word(s)')
+    parser.add_argument('--img', help='Enter image name to download')
     args = parser.parse_args()
 
     if not args.url:
@@ -161,14 +186,17 @@ def args():
     else:
         url = args.url
 
-    if not args.search:
-        print(Colours.FAIL + "Missing search string - Example: --search \"aliens exist!\"" + Colours.ENDC)
-        exit()
-    else:
+    if args.search:
+        mode = 'search'
         key = args.search
+    elif args.img:
+        mode = 'img'
+        key = args.img
+    else:
+        print('Check your syntax')
 
-    return url, key
+    return url, mode, key
 
 if __name__ == "__main__":
-    url, key = args()
-    web = Spider(url, key).get_url()
+    url, mode, key = args()
+    web = Spider(url, mode, key).get_url()
