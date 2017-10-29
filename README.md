@@ -8,9 +8,11 @@ optional arguments:
   -h, --help       show this help message and exit
   --url URL
   --search SEARCH  Enter key word(s)
+  --img IMG        Enter image name to download
 
 EXAMPLES: 
 #####./spider.py --url http://reddit.com --search boobs
+
 #####./spider.py --url http://reddit.com --img boobs
 
 

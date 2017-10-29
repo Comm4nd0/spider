@@ -180,6 +180,7 @@ def args():
     parser.add_argument('--img', help='Enter image name to download')
     args = parser.parse_args()
 
+    mode = 'spider'
     if not args.url:
         print(Colours.FAIL + "Missing URL - Example: --url http://cia.com" + Colours.ENDC)
         exit()
@@ -193,7 +194,11 @@ def args():
         mode = 'img'
         key = args.img
     else:
-        print('Check your syntax')
+        print('Check your syntax e.g --search "aliens exist!"')
+
+    if mode == 'spider':
+        print(Colours.FAIL + "Missing mode e.g. --search [string] OR --img [string]" + Colours.ENDC)
+        exit()
 
     return url, mode, key
 
